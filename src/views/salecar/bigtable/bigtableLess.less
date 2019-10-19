@@ -1,8 +1,58 @@
+*{
+    margin: 0;
+    padding: 0;
+}
 .iconbox{
     overflow: hidden;
     .icon{
         float: right;
         margin:5px;
         cursor: pointer;
+    }
+}
+.onesmallbox{
+    padding-bottom: 15px;
+    .onesmall{
+        float: left;
+        border: 2px solid skyblue;
+        border-radius:5px;
+        padding:0 10px;
+        margin-bottom: 10px;
+        margin-right: 20px;
+        position: relative;
+        cursor: pointer;
+        font-size: 16px;
+        b{
+            box-sizing: border-box;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            right: -10px;
+            top: -10px;
+            background: white;
+            border: 1px solid #000;
+            text-align: center;
+            line-height: 20px;
+        }
+        b:hover{
+            background: gold;
+        }
+    }
+}
+.clear{
+    clear: both;
+}
+.beixuanbox{
+    padding-bottom: 15px;
+    span{
+        .onesmallbox .onesmall;
+        cursor: pointer;
+    }
+}
+.btnbox{
+    margin-top: 10px;
+    Button{
+        margin-right: 10px;
     }
 }

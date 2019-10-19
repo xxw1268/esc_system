@@ -19,7 +19,7 @@ export default {
         'title': '品牌'
     },
     'series': {
-        'titla': '车系'
+        'title': '车系'
     },
     'color': {
         'title': '颜色'

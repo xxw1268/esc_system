@@ -15,11 +15,11 @@ export default class BigTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            ShowColumnModal:true
+            ShowColumnModal:false
         };
     }
     componentWillMount (){
-        this.props.dispatch({'type':'bigtable/GETLOCALSTORAGE'});
+        this.props.dispatch({'type':'bigtable/GETCOLUMNSFROMLOCALSTORAGE'});
         this.props.dispatch({'type':'bigtable/INIT'});
     }
 
@@ -29,8 +29,26 @@ export default class BigTable extends Component {
                 <Modal
                     title='调整表格列的显示'
                     visible={this.state.ShowColumnModal}
+                    footer={null}
+                    onCancel={()=>{
+                        this.setState({
+                            ShowColumnModal:false
+                        });
+                    }}
                 >
-                    <ModalInner />
+                    <ModalInner ref='modalinner'
+                        okHandler={(columns)=>{
+                            this.props.dispatch({'type':'bigtable/SETCOLUMNSTOLOCALSTORAGE', columns});
+                            this.setState({
+                                ShowColumnModal:false
+                            });
+                        }}
+                        cancelHnanler={(columns)=>{
+                            this.setState({
+                                ShowColumnModal:false
+                            });
+                        }}
+                    />
                 </Modal>
                 <div className='iconbox'>
                     <Button
@@ -54,7 +72,10 @@ export default class BigTable extends Component {
                             ...columnsMap[str]
                         }))
                     }
-                    // dataSource={this.props.results}
+                    dataSource={this.props.results}
+                    pagination={{
+                        total:this.props.total
+                    }}
                 />
             </div>
         );

@@ -5,7 +5,8 @@ export default {
     state:{
         current:1,
         columnArr:[],
-        results:[]
+        results:[],
+        total:1
     },
     reducers:{
         CHANGECOLUMNS (state, {columnArr}){
@@ -14,32 +15,37 @@ export default {
                 columnArr
             };
         },
-        CHANGE (state, {results}){
+        CHANGE (state, {results, total}){
             return {
                 ...state,
-                results
+                results,
+                total
             };
         }
     },
     effects:{
-        *GETLOCALSTORAGE (action, {put}){
-            // 从本地存储度读取列的存储信息
-            const localStorageArr = localStorage.getItem('columns');
-            console.log(localStorageArr);
-            //判断当前的数组是否为空，null表示第一次访问或者清空过缓存,
-            //本地存储中并没有默认的项
-            if (localStorageArr === null){
-                localStorage.setItem('columns', JSON.stringify(['image', 'id', 'brand', 'color']));
+        // 读本地存储
+        *GETCOLUMNSFROMLOCALSTORAGE (action, {put}) {
+            // 试着从本地存储中读取column字段
+            const columnsFromLocalStorage = localStorage.getItem('columns');
+            // 如果这个字段读取出来是null，表示用户第一次来本网站或者清空过缓存
+            if (columnsFromLocalStorage === null) {
+                // 第一次来，没事儿，给你赋予一个默认值
+                localStorage.setItem('columns', JSON.stringify(['image', 'id', 'brand', 'series', 'color']));
             }
-
-            //再次从本地存储读取存储信息并进行转换(字符串转换)
+            // 再次从本地存储中读取列存储信息，并转换
             const columnArr = JSON.parse(localStorage.getItem('columns'));
-
-            yield put({'type':'CHANGECOLUMNS', columnArr});
+            yield put({'type': 'CHANGECOLUMNS', columnArr});
         },
-        *INIT (action, {put}){
-            const {results} = yield axios.get('/api/car').then(data=>data.data);
-            yield put({'type':'CHANGE', results});
+        // 设本地存储
+        *SETCOLUMNSTOLOCALSTORAGE ({columns}, {put}) {
+            localStorage.setItem('columns', JSON.stringify(columns));
+            yield put({'type': 'GETCOLUMNSFROMLOCALSTORAGE'});
+        },
+        // 读取Ajax
+        *INIT (action, {put}) {
+            const {results, total} = yield axios.get('/api/car').then(data => data.data);
+            yield put({'type': 'CHANGE', results, total});
         }
     }
 };
