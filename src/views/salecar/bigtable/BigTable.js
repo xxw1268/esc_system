@@ -1,10 +1,61 @@
 import React, {Component} from 'react';
+import {connect} from 'dva';
+import {Table, Button, Modal} from 'antd';
 
+import columnsMap from './columnsMap.js';
+import './bigtableLess.less';
+import ModalInner from './ModalInner.js';
+
+@connect(
+    ({bigtable})=>({
+        ...bigtable
+    })
+)
 export default class BigTable extends Component {
+    constructor (props) {
+        super(props);
+        this.state = {
+            ShowColumnModal:true
+        };
+    }
+    componentWillMount (){
+        this.props.dispatch({'type':'bigtable/GETLOCALSTORAGE'});
+        this.props.dispatch({'type':'bigtable/INIT'});
+    }
+
     render () {
         return (
             <div>
-                456
+                <Modal
+                    title='调整表格列的显示'
+                    visible={this.state.ShowColumnModal}
+                >
+                    <ModalInner />
+                </Modal>
+                <div className='iconbox'>
+                    <Button
+                        type='primary'
+                        shape='circle'
+                        icon='setting'
+                        className='icon'
+                        onClick={()=>{
+                            this.setState({
+                                ShowColumnModal:true
+                            });
+                        }}
+                    ></Button>
+                </div>
+                <Table
+                    rowKey='id'
+                    columns={
+                        this.props.columnArr.map(str => ({
+                            'key': str,
+                            'dataIndex': str,
+                            ...columnsMap[str]
+                        }))
+                    }
+                    // dataSource={this.props.results}
+                />
             </div>
         );
     }
