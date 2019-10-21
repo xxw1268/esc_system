@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'dva';
 import _ from 'lodash';
-import {Icon, Button} from 'antd';
+import {Button, Icon} from 'antd';
 
 import OneSmall from './OneSmall.js';
 import columnsMap from './columnsMap.js';
@@ -13,11 +13,11 @@ import columnsMap from './columnsMap.js';
 )
 export default class ModalInner extends Component {
     constructor (props) {
-        super();
+        super(props);
         let beixuanArr = _.difference(Object.keys(columnsMap), props.columnArr);
         this.state = {
             columnArr:props.columnArr.slice(),
-            beixuanArr:beixuanArr
+            beixuanArr
         };
     }
     deloneitem (english){
@@ -29,58 +29,58 @@ export default class ModalInner extends Component {
     render () {
         return (
             <div>
-                <h3>当前已展示的列(可拖拽排序)：</h3>
+                <h3>当前以为您展示的列(可拖拽排序):</h3>
                 <div className='onesmallbox'>
                     {
                         this.state.columnArr.map((item, i)=>{
-                            return (
-                                <OneSmall
-                                    key={i}
-                                    onSortItems={(columnArr)=>{
-                                        this.setState({
-                                            columnArr
-                                        });
-                                    }}
-                                    items={this.state.columnArr}
-                                    sortId={i}
-                                    english={item}
-                                    chinese={columnsMap[item].title}
-                                    other={{
-                                        deloneitem:this.deloneitem.bind(this)
-                                    }}
-                                >
-                                </OneSmall>
-                            );
+                            return <OneSmall
+                                key={i}
+                                onSortItems={(columnArr)=>{
+                                    this.setState({
+                                        columnArr
+                                    });
+                                }}
+                                items={this.state.columnArr}
+                                sortId={i}
+                                english={item}
+                                chinese={columnsMap[item].title}
+                                other={{
+                                    deloneitem:this.deloneitem.bind(this)
+                                }}
+                            >
+                            </OneSmall>;
                         })
                     }
                 </div>
-                <div className='clear'></div>
-                <h3>备选的列</h3>
-                <div className="beixuanbox">
+                <div className="clear"></div>
+                <h3>备选列表项(点击'+'添加)：</h3>
+                <div className='beixuanbox'>
                     {
                         this.state.beixuanArr.map((item, i)=>{
                             return <span key={i}>
                                 {columnsMap[item].title}
-                                <b onClick={()=>{
-                                    this.setState({
-                                        beixuanArr:this.state.beixuanArr.filter(_item => _item !== item),
-                                        columnArr:[...this.state.columnArr, item]
-                                    });
-                                }}><Icon type="plus"/></b>
+                                <b
+                                    onClick={()=>{
+                                        this.setState({
+                                            columnArr:[...this.state.columnArr, item],
+                                            beixuanArr:this.state.beixuanArr.filter(_item=>_item !== item)
+                                        });
+                                    }}
+                                ><Icon type='plus'/></b>
                             </span>;
                         })
                     }
                 </div>
-                <div className='clear'></div>
+                <div className="clear"></div>
                 <div className='btnbox'>
                     <Button
                         onClick={()=>{
-                            this.props.cancelHnanler(this.state.cancelHnanler);
+                            this.props.canHan(this.state.canHan);
                         }}
                     >取消</Button>
                     <Button
                         onClick={()=>{
-                            this.props.okHandler(this.state.columnArr);
+                            this.props.okHan(this.state.columnArr);
                         }}
                     >确定</Button>
                 </div>

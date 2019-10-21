@@ -1,51 +1,82 @@
 import axios from 'axios';
+import querystring from 'querystring';
 
 export default {
-    namespace: 'bigtable',
+    namespace:'bigtable',
     state:{
-        current:1,
-        columnArr:[],
         results:[],
-        total:1
+        columnArr:[],
+        total:0,
+        current:1,
+        pageSize:10,
+        color:[],
+        engine:[],
+        exhaust:[],
+        fuel:[]
     },
     reducers:{
-        CHANGECOLUMNS (state, {columnArr}){
+        LOCALSTORAGE (state, {columnArr}){
             return {
                 ...state,
                 columnArr
             };
         },
-        CHANGE (state, {results, total}){
+        CHANGERESULTS (state, {results, total}){
             return {
                 ...state,
                 results,
                 total
             };
+        },
+        CURRENT (state, {current}){
+            return {
+                ...state,
+                current
+            };
+        },
+        FILTER (state, {k, v}){
+            return {
+                ...state,
+                [k]:v
+            };
         }
     },
     effects:{
-        // 读本地存储
-        *GETCOLUMNSFROMLOCALSTORAGE (action, {put}) {
-            // 试着从本地存储中读取column字段
-            const columnsFromLocalStorage = localStorage.getItem('columns');
-            // 如果这个字段读取出来是null，表示用户第一次来本网站或者清空过缓存
-            if (columnsFromLocalStorage === null) {
-                // 第一次来，没事儿，给你赋予一个默认值
-                localStorage.setItem('columns', JSON.stringify(['image', 'id', 'brand', 'series', 'color']));
+        *GETLOCALSTPRAGE (action, {put}){
+            //从本地存储请求数据
+            const columnLocalStorage = localStorage.getItem('columns');
+            //判断本地存储中有没有数据，没有就设置
+            if (columnLocalStorage === null){
+                localStorage.setItem('columns', JSON.stringify(['image', 'id', 'color', 'brand']));
             }
-            // 再次从本地存储中读取列存储信息，并转换
+            //再次从本地存储请求数据
             const columnArr = JSON.parse(localStorage.getItem('columns'));
-            yield put({'type': 'CHANGECOLUMNS', columnArr});
+            yield put({'type':'LOCALSTORAGE', columnArr});
         },
-        // 设本地存储
-        *SETCOLUMNSTOLOCALSTORAGE ({columns}, {put}) {
+        *SETCOLUMNTOTALSTORAGE ({columns}, {put}){
+            //重新设置columns数组,转化为字符串存放在本地存储中
             localStorage.setItem('columns', JSON.stringify(columns));
-            yield put({'type': 'GETCOLUMNSFROMLOCALSTORAGE'});
+            yield put({'type':'GETLOCALSTPRAGE'});
         },
-        // 读取Ajax
-        *INIT (action, {put}) {
-            const {results, total} = yield axios.get('/api/car').then(data => data.data);
-            yield put({'type': 'CHANGE', results, total});
+        *INIT (action, {put, select}){
+            const {current, color, engine, exhaust, fuel} = yield select(({bigtable})=>bigtable);
+            const {results, total} = yield axios.get('/api/car?' + querystring.stringify({
+                'page':current,
+                'color':color.join('v'),
+                'engine':engine.join('v'),
+                'exhaust':exhaust.join('v'),
+                'fuel':fuel.join('v')
+            })).then(data=>data.data);
+            yield put({'type':'CHANGERESULTS', results, total});
+        },
+        *CURRENTSAGA ({current}, {put}){
+            yield put({'type':'CURRENT', current});
+            yield put({'type':'INIT'});
+        },
+        *FILTERSAGA ({k, v}, {put}){
+            yield put({'type':'CURRENTSAGA', 'current':1});
+            yield put({'type':'FILTER', k, v});
+            yield put({'type':'INIT'});
         }
     }
 };

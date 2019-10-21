@@ -6,11 +6,13 @@ import {Icon} from 'antd';
 export default class OneSmall extends Component {
     render () {
         return (
-            <div {...this.props} className='onesmall'>
+            <div className='onesmall' {...this.props}>
                 {this.props.chinese}
-                <b onClick={()=>{
-                    this.props.other.deloneitem(this.props.english);
-                }}><Icon type="close" /></b>
+                <b
+                    onClick={()=>{
+                        this.props.other.deloneitem(this.props.english);
+                    }}
+                ><Icon type='close'/></b>
             </div>
         );
     }
