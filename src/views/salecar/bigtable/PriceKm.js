@@ -68,7 +68,6 @@ export default class PriceKm extends Component {
                                 10:'10万',
                                 30:'30万',
                                 50:'50万',
-                                70:'70万',
                                 100:'100万',
                                 150:'150万',
                                 200:'200万'

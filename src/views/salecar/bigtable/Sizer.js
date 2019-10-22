@@ -19,7 +19,6 @@ export default class Sizer extends Component {
             buydate: []
         };
     }
-
     render () {
         return (
             <div>
