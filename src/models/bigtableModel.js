@@ -12,7 +12,13 @@ export default {
         color:[],
         engine:[],
         exhaust:[],
-        fuel:[]
+        fuel:[],
+        buydate:[],
+        allbs:{},
+        brand:'',
+        series:'',
+        price:[0, 120],
+        km:[0, 2000000]
     },
     reducers:{
         LOCALSTORAGE (state, {columnArr}){
@@ -39,6 +45,12 @@ export default {
                 ...state,
                 [k]:v
             };
+        },
+        ALLBSS (state, {obj}){
+            return {
+                ...state,
+                allbs:obj
+            };
         }
     },
     effects:{
@@ -59,13 +71,18 @@ export default {
             yield put({'type':'GETLOCALSTPRAGE'});
         },
         *INIT (action, {put, select}){
-            const {current, color, engine, exhaust, fuel} = yield select(({bigtable})=>bigtable);
+            const {current, color, engine, exhaust, fuel, buydate, brand, series, price, km} = yield select(({bigtable})=>bigtable);
             const {results, total} = yield axios.get('/api/car?' + querystring.stringify({
                 'page':current,
                 'color':color.join('v'),
                 'engine':engine.join('v'),
                 'exhaust':exhaust.join('v'),
-                'fuel':fuel.join('v')
+                'fuel':fuel.join('v'),
+                'buydate':buydate.join('to'),
+                'price':price.join('to'),
+                'km':km.join('to'),
+                brand,
+                series
             })).then(data=>data.data);
             yield put({'type':'CHANGERESULTS', results, total});
         },
@@ -76,7 +93,15 @@ export default {
         *FILTERSAGA ({k, v}, {put}){
             yield put({'type':'CURRENTSAGA', 'current':1});
             yield put({'type':'FILTER', k, v});
+            //如果改变brand,多一次put传递series数据
+            if (k === 'brand') {
+                yield put({'type': 'FILTER', 'k': 'series', 'v': ''});
+            }
             yield put({'type':'INIT'});
+        },
+        *ALLBSSAGA (action, {put}){
+            const obj = yield axios.get('/api/allbs').then(data=>data.data);
+            yield put({'type':'ALLBSS', obj});
         }
     }
 };

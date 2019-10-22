@@ -1,6 +1,11 @@
 import React, {Component} from 'react';
 import {connect} from 'dva';
-import {Button, Row, Col} from 'antd';
+
+import OneSizer from './OneSizer.js';
+import Tags from './Tags.js';
+import BuyDate from './BuyDate.js';
+import BSFilter from './BSFilter.js';
+import PriceKm from './PriceKm.js';
 
 @connect(
     ({bigtable})=>({
@@ -11,70 +16,37 @@ export default class Sizer extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            mode:false,
-            arr:[]
+            buydate: []
         };
     }
+
     render () {
-        const {arr, e, c} = this.props;
         return (
             <div>
-                <div className='btnbox'>
-                    <Row
-                        style={{'display':this.state.mode === false && this.props[e].length !== 0 ? 'none' : 'block'}}
-                    >
-                        <Col span={2}>
-                            <b>{c}：</b>
-                        </Col>
-                        <Col span={16}>
-                            {
-                                arr.map(item=>{
-                                    return <Button
-                                        style={{
-                                            'float':'left'
-                                        }}
-                                        key={item}
-                                        value={item}
-                                        onClick={()=>{
-                                            if (this.state.mode === false){
-                                                this.props.dispatch({'type':'bigtable/FILTERSAGA', 'k':e, 'v':[item]});
-                                            } else {
-                                                if (!this.state.arr.includes(item)){
-                                                    this.setState({
-                                                        arr:[...this.state.arr, item]
-                                                    });
-                                                } else {
-                                                    this.setState({
-                                                        arr:this.state.arr.filter(_item=>_item !== item)
-                                                    });
-                                                }
-                                            }
-                                        }}
-                                        type={this.state.arr.includes(item) ? 'primary' : 'null'}
-                                    >{item}</Button>;
-                                })
-                            }
-                        </Col>
-                        <Col span={2} offset={2}>
-                            <Button
-                                type={this.state.mode === false ? 'null' : 'primary'}
-                                onClick={()=>{
-                                    this.setState({
-                                        mode : !this.state.mode
-                                    });
-                                    if (this.state.mode !== false){
-                                        this.props.dispatch({'type':'bigtable/FILTERSAGA', 'k':e, 'v':this.state.arr});
-                                        this.setState({
-                                            arr:[]
-                                        });
-                                    }
-                                }}
-                            >
-                                {this.state.mode === false ? '多选' : '确定'}
-                            </Button>
-                        </Col>
-                    </Row>
-                </div>
+                <Tags/>
+                <BSFilter/>
+                <OneSizer
+                    e={'color'}
+                    c={'颜色'}
+                    options={['红', '橙', '黄', '绿', '蓝', '紫', '黑', '白', '灰', '银灰', '香槟', '咖啡', '其他']}
+                />
+                <OneSizer
+                    e={'exhaust'}
+                    c={'发动机'}
+                    options={['1.0L', '1.2L', '1.4L', '1.6L', '1.8L', '2.0L', '3.0L', '5.0L', '1.6T']}
+                />
+                <OneSizer
+                    e={'engine'}
+                    c={'尾气'}
+                    options={['国一', '国二', '国三', '国四', '国五']}
+                />
+                <OneSizer
+                    e={'fuel'}
+                    c={'燃料'}
+                    options={['柴油', '汽油', '油电混合', '纯电动']}
+                />
+                <BuyDate/>
+                <PriceKm/>
             </div>
         );
     }

@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 
 export default {
     'price': {
@@ -25,13 +26,23 @@ export default {
         'title': '颜色'
     },
     'km': {
-        'title': '里程'
+        'title': '里程',
+        'render':(txt)=>{
+            return <div>
+                {txt.toString().replace(/\B(?=(...)+$)/g, ',')}
+            </div>;
+        }
     },
     'engine': {
         'title': '发动机'
     },
     'buydate': {
-        'title': '购买日期'
+        'title': '购买日期',
+        'render':(txt)=>{
+            return <div>
+                {moment(txt).format('YYYY年MM月DD日')}
+            </div>;
+        }
     },
     'exhaust': {
         'title': '排放'
