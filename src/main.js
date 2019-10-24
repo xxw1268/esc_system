@@ -1,15 +1,17 @@
 import React from 'react';
 import Dva from 'dva';
 
-import App from './App.js';
 import bigtableModel from './models/bigtableModel.js';
+import detailModel from './models/detailModel.js';
+import salecarModel from './models/salecarModel.js';
+import route from './route.js';
 
 const app = Dva();
 
 app.model(bigtableModel);
+app.model(detailModel);
+app.model(salecarModel);
 
-app.router(() => {
-    return <App />;
-});
+app.router(route);
 
 app.start('#app');

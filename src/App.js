@@ -3,7 +3,7 @@ import {Layout, Menu, Breadcrumb, Icon} from 'antd';
 
 const {SubMenu} = Menu;
 const {Header, Content, Sider} = Layout;
-import BigTable from './views/salecar/bigtable/BigTable';
+import BigTable from './views/buycar/bigtable/BigTable';
 
 export default class App extends Component {
     render () {

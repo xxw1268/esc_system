@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import {Link} from 'dva/router';
 
 export default {
     'price': {
@@ -9,7 +10,9 @@ export default {
         'title': '图片',
         'render': (txt, {id})=>{
             return <div>
-                <img width={80} src={`/api/images/carimages_small/${id}/view/${txt}`} alt=""/>
+                <Link to={'/buycar/bigtable/' + id}>
+                    <img width={80} src={`http://www.aiqianduan.com:7897/images/carimages_small/${id}/view/${txt}`}/>
+                </Link>
             </div>;
         }
     },

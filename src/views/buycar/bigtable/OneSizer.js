@@ -43,7 +43,7 @@ export default class Sizer extends Component {
                                     if (this.state.mode){
                                         if (this.state.arr.includes(item)){
                                             this.setState({
-                                                arr:this.state.arr.filter(_item => item !== item)
+                                                arr:this.state.arr.filter(_item => _item !== item)
                                             });
                                         } else {
                                             this.setState({

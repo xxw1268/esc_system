@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import {connect} from 'dva';
-import {Table, Modal, Button, Tag} from 'antd';
+import {Table, Modal, Button} from 'antd';
 
 import columnsMap from './columnsMap';
 import './bigtableLess.less';
 import ModalInner from './ModalInner.js';
 import Sizer from './Sizer.js';
+import LR from './../../../layouts/LR.js';
 
 @connect(
     ({bigtable})=>({
@@ -25,7 +26,7 @@ export default class BigTable extends Component {
     }
     render () {
         return (
-            <div>
+            <LR>
                 <Sizer/>
                 <Modal
                     title='选择显示的列表项'
@@ -83,7 +84,7 @@ export default class BigTable extends Component {
                         }
                     }}
                 />
-            </div>
+            </LR>
         );
     }
 }

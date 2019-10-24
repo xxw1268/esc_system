@@ -16,12 +16,13 @@
     "dva": "^2.4.1",
     "eslint-plugin-react": "^7.16.0",
     "lodash": "^4.17.15",
-    "moment": "2.24.0",
+	  "moment": "2.24.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "react-sortable": "^2.0.0",
     "redux-logger": "^3.0.6",
-    "style-jsx": "0.0.0"
+    "style-jsx": "0.0.0",
+    "@hanyk/rc-viewer": "0.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
