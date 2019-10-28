@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {Form, Input, Cascader, Button} from 'antd';
+import {Form, Input, Cascader, Button, Radio, DatePicker} from 'antd';
 import {connect} from 'dva';
+import Axios from 'axios';
 
 @Form.create({
     name:'myform'
@@ -15,7 +16,7 @@ import {connect} from 'dva';
         ...salecar
     })
 )
-export default class MyForm extends Component {
+export default class Step1 extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -27,7 +28,7 @@ export default class MyForm extends Component {
         this.props.dispatch({'type': 'bigtable/ALLBSSAGA'});
     }
     render () {
-        const {getFieldDecorator} = this.props.form;
+        const {getFieldDecorator, validateFields} = this.props.form;
         const formItemLayout = {
             labelCol: {
                 sm: {span: 4}
@@ -87,7 +88,7 @@ export default class MyForm extends Component {
                 <Form.Item label="品牌和车系">
                     {
                         getFieldDecorator(
-                            'brand 和 series',
+                            'bs',
                             {
                                 rules: [
                                     {
@@ -174,7 +175,105 @@ export default class MyForm extends Component {
                         )(<Input />)
                     }
                 </Form.Item>
-                {this.props.token}
+                <Form.Item label="颜色">
+                    {
+                        getFieldDecorator(
+                            'color',
+                            {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: '必须填写'
+                                    }
+                                ]
+                            }
+                        )(<Radio.Group options={['红', '橙', '黄', '绿', '蓝', '黑', '白', '灰', '香槟']}></Radio.Group>)
+                    }
+                </Form.Item>
+                <Form.Item label="排放">
+                    {
+                        getFieldDecorator(
+                            'exhaust',
+                            {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: '必须填写'
+                                    }
+                                ]
+                            }
+                        )(<Radio.Group options={['国一', '国二', '国三', '国四', '国五']}></Radio.Group>)
+                    }
+                </Form.Item>
+                <Form.Item label="发动机">
+                    {
+                        getFieldDecorator(
+                            'engine',
+                            {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: '必须填写'
+                                    }
+                                ]
+                            }
+                        )(<Radio.Group options={['1.0L', '1.2L', '1.4L', '1.6L', '1.8L', '2.0L', '3.0L', '5.0L', '1.6T']}></Radio.Group>)
+                    }
+                </Form.Item>
+                <Form.Item label="燃料">
+                    {
+                        getFieldDecorator(
+                            'fuel',
+                            {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: '必须填写'
+                                    }
+                                ]
+                            }
+                        )(<Radio.Group options={['汽油', '柴油', '纯电动', '油电混合']}></Radio.Group>)
+                    }
+                </Form.Item>
+                <Form.Item label="购买日期">
+                    {
+                        getFieldDecorator(
+                            'buydate',
+                            {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: '必须填写'
+                                    }
+                                ]
+                            }
+                        )(<DatePicker />)
+                    }
+                </Form.Item>
+                <Form.Item label='提交'>
+                    <Button onClick={()=>{
+                        validateFields((errors, values)=>{
+                            if (errors === null){
+                                let yanzhengma = this.props.form.getFieldValue('yzm');
+                                let token = this.props.token;
+                                Axios.get('http://192.168.2.250:8494/cmsg.php?yanzhengma=' + yanzhengma + '&token=' + token).then(data=>{
+                                    if (data.data === 'nook'){
+                                        let brand = values['bs'][1];
+                                        let series = values['bs'][2];
+                                        let color = values['color'];
+                                        let exhaust = values['exhaust'];
+                                        let engine = values['engine'];
+                                        let fuel = values['fuel'];
+                                        let buydate = values['buydate'].unix() * 1000;
+                                        this.props.dispatch({'type': 'salecar/CHANGESTEP', 'step':1, 'stepdata': {brand, series, color, exhaust, engine, fuel, buydate}});
+                                    } else {
+                                        message.erroe('请输入正确的手机验证码');
+                                    }
+                                });
+                            }
+                        });
+                    }}>下一步</Button>
+                </Form.Item>
             </Form>
         );
     }

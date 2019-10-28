@@ -4,8 +4,9 @@ import querystring from 'querystring';
 export default {
     namespace:'salecar',
     state:{
-        token: '',
-        options:[]
+        'token': '',
+        'step': 3,
+        'step1data': {}
     },
     reducers:{
         CHANGETOKEN (state, {token}){
@@ -14,10 +15,11 @@ export default {
                 token
             };
         },
-        OPTIONS (state, {options}){
+        CHANGESTEP (state, {step, step1data}) {
             return {
                 ...state,
-                options
+                step,
+                step1data: step1data !== undefined ? step1data : state.step1data
             };
         }
     },
@@ -28,9 +30,8 @@ export default {
             })).then(data=>data.data);
             yield put({'type': 'CHANGETOKEN', token});
         },
-        *OPTIONSSAGA ({options}, {put}){
-            yield put({'type': 'OPTIONS', options});
-            console.log(options);
+        *ADDCAR ({views, inner, more, engine}, {put}){
+            yield put({'type': 'CHANGESTEP', 'step': 3});
         }
     }
 };

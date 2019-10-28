@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Layout, Menu} from 'antd';
+import {Link} from 'dva/router';
 import './layout.less';
 
 const {Header} = Layout;
@@ -16,9 +17,8 @@ export default class TB extends Component {
                         defaultSelectedKeys={['2']}
                         style={{lineHeight: '64px'}}
                     >
-                        <Menu.Item key="1">nav 1</Menu.Item>
-                        <Menu.Item key="2">nav 2</Menu.Item>
-                        <Menu.Item key="3">nav 3</Menu.Item>
+                        <Menu.Item key="1"><Link to='/buycar/bigtable'>买车</Link></Menu.Item>
+                        <Menu.Item key="2"><Link to='/salecar/personalcar'>卖车</Link></Menu.Item>
                     </Menu>
                 </Header>
                 <Layout>
