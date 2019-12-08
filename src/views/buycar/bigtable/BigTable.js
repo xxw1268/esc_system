@@ -1,88 +1,85 @@
 import React, {Component} from 'react';
 import {connect} from 'dva';
-import {Table, Modal, Button} from 'antd';
+import {Table, Button, Modal} from 'antd';
 
-import columnsMap from './columnsMap';
-import './bigtableLess.less';
+import columnsMap from './columnsMap.js';
 import ModalInner from './ModalInner.js';
-import Sizer from './Sizer.js';
-import LR from './../../../layouts/LR.js';
+import FilterBox from './FilterBox.js';
+import LR from '../../../layouts/LR.js';
+import './bigtable.less';
 
 @connect(
-    ({bigtable})=>({
+    ({bigtable}) => ({
         ...bigtable
     })
 )
 export default class BigTable extends Component {
-    constructor (props) {
-        super(props);
+    constructor () {
+        super();
         this.state = {
-            ShowColumnModal:false
+            // 是否显示模态框
+            showChangeColumnModal: false
         };
     }
-    componentWillMount (){
-        this.props.dispatch({'type':'bigtable/GETLOCALSTPRAGE'});
-        this.props.dispatch({'type':'bigtable/INIT'});
+    // 组件即将上树
+    componentWillMount () {
+        this.props.dispatch({'type': 'bigtable/GETCOLUMNSFROMLOCALSTORAGE'});
+        this.props.dispatch({'type': 'bigtable/INIT'});
     }
     render () {
         return (
-            <LR>
-                <Sizer/>
+            <LR c="买车" d="大表买车">
                 <Modal
-                    title='选择显示的列表项'
-                    visible={this.state.ShowColumnModal}
+                    title="请调整表格列的显示"
+                    destroyOnClose={true}
+                    visible={this.state.showChangeColumnModal}
                     footer={null}
                     onCancel={()=>{
                         this.setState({
-                            ShowColumnModal:false
+                            showChangeColumnModal: false
                         });
                     }}
                 >
-                    <ModalInner ref='modalinner'
-                        okHan={(columns)=>{
-                            this.props.dispatch({'type':'bigtable/SETCOLUMNTOTALSTORAGE', columns});
-                            this.setState({
-                                ShowColumnModal:false
-                            });
-                        }}
-                        canHan={()=>{
-                            this.setState({
-                                ShowColumnModal:false
-                            });
-                        }}
-                    />
+                    <ModalInner ref='modalinner' okHandler={(columns)=>{
+                        // 点击确定按钮之后做的事情
+                        this.props.dispatch({'type': 'bigtable/SETCOLUMNSTOLOCALSTORAGE', columns});
+                        this.setState({
+                            showChangeColumnModal: false
+                        });
+                    }} cancelHandler={(columns)=>{
+                        // 点击取消按钮之后做的事情
+                        this.setState({
+                            showChangeColumnModal: false
+                        });
+                    }} />
                 </Modal>
-                <div className='iconbox'>
+
+                <FilterBox />
+
+                <div className="button_box">
                     <Button
-                        className='icon'
+                        className="btn"
                         type="primary"
                         shape="circle"
                         icon="setting"
                         onClick={()=>{
                             this.setState({
-                                ShowColumnModal:true
+                                showChangeColumnModal: true
                             });
                         }}
                     />
                 </div>
+                <h3>共{this.props.total}辆车</h3>
                 <Table
-                    rowKey='id'
+                    rowKey="id"
                     columns={
-                        this.props.columnArr.map(str=>({
-                            'key':str,
-                            'dataIndex':str,
+                        this.props.columnArr.map(str => ({
+                            'key': str,
+                            'dataIndex': str,
                             ...columnsMap[str]
-                            //...columnsMap[str]：输出结果为'title':'...'
-                        }))}
+                        }))
+                    }
                     dataSource={this.props.results}
-                    pagination={{
-                        total:this.props.total,
-                        current:this.props.current,
-                        pageSize:this.props.pageSize,
-                        onChange:(current)=>{
-                            this.props.dispatch({'type':'bigtable/CURRENTSAGA', 'current':current});
-                        }
-                    }}
                 />
             </LR>
         );

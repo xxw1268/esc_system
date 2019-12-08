@@ -59,21 +59,21 @@ export default class OneRow extends Component {
         });
 
         // 引入jQuery，如果window（全局）没有$的定义
-        if (window['$'] === undefined) {
-            // 创建script标签加载
-            let oScript1 = document.createElement('script');
-            oScript1.src = '/jslib/jquery.min.js';
-            document.body.appendChild(oScript1);
-            // 加载完jQuery就加载jQuery UI
-            oScript1.onload = () => {
-                let oScript2 = document.createElement('script');
-                oScript2.src = '/jslib/jquery-ui.min.js';
-                document.body.appendChild(oScript2);
-                oScript2.onload = () => {
-                    $('.row_box').sortable();
-                };
-            };
-        }
+        // if (window['$'] === undefined) {
+        //     // 创建script标签加载
+        //     let oScript1 = document.createElement('script');
+        //     oScript1.src = 'http://127.0.0.1:8080/jslib/jquery.min.js';
+        //     document.body.appendChild(oScript1);
+        //     // 加载完jQuery就加载jQuery UI
+        //     oScript1.onload = () => {
+        //         let oScript2 = document.createElement('script');
+        //         oScript2.src = 'http://127.0.0.1:8080/jslib/jquery-ui.min.js';
+        //         document.body.appendChild(oScript2);
+        //         oScript2.onload = () => {
+        //             $('.row_box').sortable();
+        //         };
+        //     };
+        // }
     }
 
     del (id) {
@@ -103,7 +103,7 @@ export default class OneRow extends Component {
                     });
                 }}/>
             </Row>
-            <div className="row_box" ref="row_box">
+            <div className="row_box" ref="row_box" data-box={this.props.c}>
                 {
                     this.state.files.map((item, index) => <OnePic
                         key={item.id}

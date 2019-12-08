@@ -1,107 +1,119 @@
-import axios from 'axios';
+import http from '../http/http.js';
 import querystring from 'querystring';
 
 export default {
-    namespace:'bigtable',
-    state:{
-        results:[],
-        columnArr:[],
-        total:0,
-        current:1,
-        pageSize:10,
-        color:[],
-        engine:[],
-        exhaust:[],
-        fuel:[],
-        buydate:[],
-        allbs:{},
-        brand:'',
-        series:'',
-        price:[0, 120],
-        km:[0, 2000000]
+    namespace: 'bigtable',
+    state: {
+        // 当前页
+        current: 1,
+        // 列定义
+        columnArr: [],
+        // 车结果
+        results: [],
+        // 总数
+        total: 0,
+        // 筛选器：
+        color: [],
+        exhaust: [],
+        fuel: [],
+        engine: [],
+        buydate: [],
+        price: [0, 120],
+        km: [0, 2000000],
+        // 所有品牌
+        allbs: {},
+        // 筛选的品牌
+        brand: '',
+        // 筛选的车系
+        series: ''
     },
-    reducers:{
-        LOCALSTORAGE (state, {columnArr}){
+    reducers: {
+        CHANGECOLUMNS (state, {columnArr}) {
             return {
                 ...state,
                 columnArr
             };
         },
-        CHANGERESULTS (state, {results, total}){
+        CHANGERESULTS  (state, {results, total}) {
             return {
                 ...state,
                 results,
                 total
             };
         },
-        CURRENT (state, {current}){
+        CHANGEFILTER (state, {k, v}) {
             return {
                 ...state,
-                current
+                [k]: v
             };
         },
-        FILTER (state, {k, v}){
+        LOADALLBS (state, {obj}) {
             return {
                 ...state,
-                [k]:v
-            };
-        },
-        ALLBSS (state, {obj}){
-            return {
-                ...state,
-                allbs:obj
+                allbs: obj
             };
         }
     },
-    effects:{
-        *GETLOCALSTPRAGE (action, {put}){
-            //从本地存储请求数据
-            const columnLocalStorage = localStorage.getItem('columns');
-            //判断本地存储中有没有数据，没有就设置
-            if (columnLocalStorage === null){
-                localStorage.setItem('columns', JSON.stringify(['image', 'id', 'color', 'brand']));
+    effects: {
+        // 读本地存储中读取列
+        *GETCOLUMNSFROMLOCALSTORAGE (action, {put}) {
+            // 试着从本地存储中读取column字段
+            const columnsFromLocalStorage = localStorage.getItem('columns');
+            // 如果这个字段读取出来是null，表示用户第一次来本网站或者清空过缓存
+            if (columnsFromLocalStorage === null) {
+                // 第一次来，没事儿，给你赋予一个默认值
+                localStorage.setItem('columns', JSON.stringify(['image', 'id', 'brand', 'series', 'color']));
             }
-            //再次从本地存储请求数据
+            // 再次从本地存储中读取列存储信息，并转换
             const columnArr = JSON.parse(localStorage.getItem('columns'));
-            yield put({'type':'LOCALSTORAGE', columnArr});
+            yield put({'type': 'CHANGECOLUMNS', columnArr});
         },
-        *SETCOLUMNTOTALSTORAGE ({columns}, {put}){
-            //重新设置columns数组,转化为字符串存放在本地存储中
+        // 设本地存储
+        *SETCOLUMNSTOLOCALSTORAGE ({columns}, {put}) {
             localStorage.setItem('columns', JSON.stringify(columns));
-            yield put({'type':'GETLOCALSTPRAGE'});
+            yield put({'type': 'GETCOLUMNSFROMLOCALSTORAGE'});
         },
-        *INIT (action, {put, select}){
-            const {current, color, engine, exhaust, fuel, buydate, brand, series, price, km} = yield select(({bigtable})=>bigtable);
-            const {results, total} = yield axios.get('/api/car?' + querystring.stringify({
-                'page':current,
-                'color':color.join('v'),
-                'engine':engine.join('v'),
-                'exhaust':exhaust.join('v'),
-                'fuel':fuel.join('v'),
-                'buydate':buydate.join('to'),
-                'price':price.join('to'),
-                'km':km.join('to'),
-                brand,
-                series
-            })).then(data=>data.data);
-            yield put({'type':'CHANGERESULTS', results, total});
-        },
-        *CURRENTSAGA ({current}, {put}){
-            yield put({'type':'CURRENT', current});
-            yield put({'type':'INIT'});
-        },
-        *FILTERSAGA ({k, v}, {put}){
-            yield put({'type':'CURRENTSAGA', 'current':1});
-            yield put({'type':'FILTER', k, v});
-            //如果改变brand,多一次put传递series数据
-            if (k === 'brand') {
-                yield put({'type': 'FILTER', 'k': 'series', 'v': ''});
+        // 读取Ajax
+        *INIT (action, {put, select}) {
+            const {color, exhaust, fuel, engine, buydate, brand, series, price, km} = yield select(({bigtable}) => bigtable);
+            // 读取token
+            let token = localStorage.getItem('token');
+            // 判断
+            if (token === null) {
+                window.location = '/#/login';
+                return;
             }
-            yield put({'type':'INIT'});
+            const {results, total} = yield http.get('/api/car?' + querystring.stringify({
+                color: color.join('v'),
+                exhaust: exhaust.join('v'),
+                fuel: fuel.join('v'),
+                engine: engine.join('v'),
+                buydate: buydate.join('to'),
+                price: price.join('to'),
+                km: km.join('to'),
+                brand,
+                series,
+                pagesize: 10,
+                token
+            })).then(data => data.data);
+            yield put({'type': 'CHANGERESULTS', results, total});
         },
-        *ALLBSSAGA (action, {put}){
-            const obj = yield axios.get('/api/allbs').then(data=>data.data);
-            yield put({'type':'ALLBSS', obj});
+        // 改变筛选条件
+        *CHANGEFILTERSAGA ({k, v}, {put}) {
+            // 改变筛选条件
+            yield put({'type': 'CHANGEFILTER', k, v});
+            // 如果你改变的是brand，那么要多一次put，把品牌弄掉
+            if (k === 'brand') {
+                yield put({'type': 'CHANGEFILTER', 'k': 'series', 'v': ''});
+            }
+            // 重新拉取
+            yield put({'type': 'INIT'});
+        },
+        // 读取所有bs
+        *LOADALLBSSAGA (action, {put}) {
+            const obj = yield http.get('/api/allbs').then(data => data.data);
+            // 重新拉取
+            yield put({'type': 'LOADALLBS', obj});
         }
     }
 };

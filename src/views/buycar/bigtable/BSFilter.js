@@ -1,80 +1,80 @@
 import React, {Component} from 'react';
 import {connect} from 'dva';
-import {Row, Col, Button, Tabs} from 'antd';
+import {Button, Row, Col, DatePicker, Tabs} from 'antd';
 import classnames from 'classnames';
-
 const {TabPane} = Tabs;
 
 @connect(
-    ({bigtable})=>({
+    ({bigtable}) => ({
         ...bigtable
     })
 )
 export default class BSFilter extends Component {
-    constructor (props) {
-        super(props);
+    constructor () {
+        super();
         this.state = {
-            nowzimu: ''
+            nowDaxiezimu: ''
         };
     }
-    componentWillMount (){
-        this.props.dispatch({'type':'bigtable/ALLBSSAGA'});
+    componentWillMount () {
+        this.props.dispatch({'type': 'bigtable/LOADALLBSSAGA'});
+    }
+
+    componentWillReceiveProps (nextProp) {
+        if (nextProp.brand === '') {
+            this.setState({
+                nowDaxiezimu: ''
+            });
+        }
     }
     render () {
-        if (Object.keys(this.props.allbs).length === 0) return <div></div>;
+        if (Object.keys(this.props.allbs).length === 0) return null;
+
         return (
-            <div>
-                <Row>
-                    <Col span={2}>
+            <div className="bsfilter_box">
+                <Row className="myrow">
+                    <Col span={this.props.labelSpan}>
                         <b>品牌：</b>
                     </Col>
-                    <Col span={16}>
-                        <Tabs defaultActiveKey='1'>
+                    <Col span={18}>
+                        <Tabs defaultActiveKey="1">
                             {
-                                Object.keys(this.props.allbs).map(zimu=>{
-                                    return <TabPane tab={zimu} key={zimu}>
-                                        {
-                                            Object.keys(this.props.allbs[zimu]).map(brand=>{
-                                                return <a className={classnames(['allbs', {
-                                                    'cur':this.props.brand === brand
-                                                }])} key={brand} onClick={()=>{
-                                                    this.props.dispatch({'type':'bigtable/FILTERSAGA', 'k': 'brand', 'v': brand});
-                                                    this.setState({
-                                                        nowzimu:zimu
-                                                    });
-                                                }}
-                                                >{brand}</a>;
-                                            })
-                                        }
-                                    </TabPane>;
-                                })
+                                Object.keys(this.props.allbs).map(DAXIEZIMU => <TabPane tab={DAXIEZIMU} key={DAXIEZIMU}>
+                                    {
+                                        Object.keys(this.props.allbs[DAXIEZIMU]).map(brand => <a key={brand} className={classnames(['tab_a', {
+                                            'cur': this.props.brand === brand
+                                        }])} onClick={()=>{
+                                            this.props.dispatch({'type':'bigtable/CHANGEFILTERSAGA', 'k': 'brand', 'v': brand});
+                                            this.setState({
+                                                'nowDaxiezimu': DAXIEZIMU
+                                            });
+                                        }}>
+                                            {brand}
+                                        </a>)
+                                    }
+                                </TabPane>)
                             }
                         </Tabs>
                     </Col>
-                    <Col span={2} offset={2}>
-                    </Col>
                 </Row>
-                <Row className='myrow'>
-                    <Col span={2}>
+                <Row className="myrow">
+                    <Col span={this.props.labelSpan}>
                         <b>车系：</b>
                     </Col>
-                    <Col span={16}>
+                    <Col span={this.props.choseSpan}>
                         {
-                            (()=>{
-                                if (this.state.nowzimu !== '' && this.props.brand !== ''){
-                                    return this.props.allbs[this.state.nowzimu][this.props.brand].map(series=>{
-                                        return <a className={classnames(['allbs', {
-                                            'cur':this.props.series === series
-                                        }])} key={series} onClick={()=>{
-                                            this.props.dispatch({'type':'bigtable/FILTERSAGA', 'k': 'series', 'v': series});
-                                        }}
-                                        >{series}</a>;
-                                    });
+                            (() => {
+                                if (this.state.nowDaxiezimu !== '' && this.props.brand !== '') {
+                                    return this.props.allbs[this.state.nowDaxiezimu][this.props.brand].map(series => <a className={classnames(['tab_a', {
+                                        'cur': this.props.series === series
+                                    }])} key={series} onClick={()=>{
+                                        this.props.dispatch({'type':'bigtable/CHANGEFILTERSAGA', 'k': 'series', 'v': series});
+                                    }}>
+                                        {series}
+                                    </a>);
                                 }
                             })()
                         }
-                    </Col>
-                    <Col span={2} offset={2}>
                     </Col>
                 </Row>
             </div>

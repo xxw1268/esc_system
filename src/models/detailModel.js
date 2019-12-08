@@ -1,30 +1,31 @@
 import axios from 'axios';
-import querystring from 'querystring';
 
 export default {
-    namespace:'detail',
-    state:{
-        id:0,
-        result:[]
+    namespace: 'detail',
+    state: {
+        // 结果
+        'id': 0,
+        'result': []
     },
-    reducers:{
-        CHANGE (state, {result}){
-            return {
-                ...state,
-                result
-            };
-        },
-        CHANGEID (state, {id}){
+    reducers: {
+        CHANGEID (state, {id}) {
             return {
                 ...state,
                 id
             };
+        },
+        CHANGERESULT (state, {result}) {
+            return {
+                ...state,
+                result
+            };
         }
     },
-    effects:{
-        *INIT ({id}, {put}){
-            const {result} = yield axios.get('/api/car/' + id).then(data=>data.data);
-            yield put({'type': 'CHANGE', result});
+    effects: {
+        // 读本地存储中读取列
+        *INIT ({id}, {put}) {
+            const {result} = yield axios.get('/api/car/' + id).then(data => data.data);
+            yield put({'type': 'CHANGERESULT', result});
             yield put({'type': 'CHANGEID', id});
         }
     }

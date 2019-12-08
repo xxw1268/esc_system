@@ -6,18 +6,18 @@ export default {
     'price': {
         'title': '价格'
     },
+    'id': {
+        'title': '编号'
+    },
     'image': {
         'title': '图片',
-        'render': (txt, {id})=>{
+        'render': (txt, {id}) => {
             return <div>
                 <Link to={'/buycar/bigtable/' + id}>
-                    <img width={80} src={`http://www.aiqianduan.com:7897/images/carimages_small/${id}/view/${txt}`}/>
+                    <img src={`/api/images/carimages_small/${id}/view/${txt}`} />
                 </Link>
             </div>;
         }
-    },
-    'id': {
-        'title': '编号'
     },
     'brand': {
         'title': '品牌'
@@ -28,29 +28,29 @@ export default {
     'color': {
         'title': '颜色'
     },
-    'km': {
-        'title': '里程',
-        'render':(txt)=>{
-            return <div>
-                {txt.toString().replace(/\B(?=(...)+$)/g, ',')}
-            </div>;
-        }
+    'exhaust': {
+        'title': '排放'
+    },
+    'fuel': {
+        'title': '燃料'
     },
     'engine': {
         'title': '发动机'
     },
     'buydate': {
         'title': '购买日期',
-        'render':(txt)=>{
+        'render': (txt) => {
             return <div>
                 {moment(txt).format('YYYY年MM月DD日')}
             </div>;
         }
     },
-    'exhaust': {
-        'title': '排放'
-    },
-    'fuel': {
-        'title': '燃料'
+    'km': {
+        'title': '公里数',
+        'render': (txt) => {
+            return <div>
+                {txt.toString().replace(/\B(?=(...)+$)/g, ',')}
+            </div>;
+        }
     }
 };

@@ -1,57 +1,57 @@
 import React, {Component} from 'react';
-import {Icon} from 'antd';
+import './UpIdcard.less';
+import {Icon, Row, Col} from 'antd';
 
-import './UpIdCard.less';
-
-export default class UpIdCard extends Component {
+export default class UpIdcard extends Component {
     constructor () {
         super();
         this.state = {
-            'base64': ''
+            base64: ''
         };
     }
+
     render () {
         return (
-            <div className='upidcard_box' onClick={()=>{
-                // 创建事件
-                let evt = document.createEvent('MouseEvents');
-                // 初始化事件,只有鼠标点击事件才会触发
-                evt.initMouseEvent('click', false, false);
-                // 发送事件
-                this.refs.myfile.dispatchEvent(evt);
-            }}
-            style={{
-                'border':'1px solid #ccc',
-                'width':300,
-                'height':230,
-                'backgroundImage':'url(' + this.state.base64 + ')',
-                'backgroundSize': 'cover',
-                'backgroundRepeat': 'no-repeat',
-                'backgroundPosition': 'center center'
-            }}
-            >
-                <input type="file" ref="myfile" hidden onChange={()=>{
-                    // 得到图片
-                    let thepic = this.refs.myfile.files[0];
-                    // 上传前预览
-                    let fr = new FileReader();
-                    // 读取图片,来自props的readAsDataURL方法
-                    fr.readAsDataURL(thepic);
-                    //改变base64的值,回调的e就是ProgressEvent
-                    fr.onload = (e) => {
-                        this.setState({
-                            base64: e.target.result
-                        });
-                    };
-                    if (this.props.getZm !== undefined){
-                        this.props.getZm(thepic);
-                    }
-                    if (this.props.getFm !== undefined){
-                        this.props.getFm(thepic);
-                    }
-                }}/>
-                <Icon type="plus-circle" className='myicon'/>
-            </div>
+            <Row>
+                <Col span={4} style={{'textAlign': 'right'}}>
+                    <b className="xing">*</b>请上传身份证{this.props.c}的照片：
+                </Col>
+                <Col span={9}>
+                    <div className="upidcard_box" onClick={() => {
+                        // 创建一个事件
+                        let evt = document.createEvent('MouseEvents');
+                        // 初始化这个事件
+                        evt.initMouseEvent('click', false, false);
+                        // 发送给别人
+                        this.refs.myfile.dispatchEvent(evt);
+                    }} style={{
+                        'backgroundImage': 'url(' + this.state.base64 + ')'
+                    }}>
+                        <input type="file" hidden ref="myfile" onChange={()=>{
+                            // 得到图片
+                            let thepic = this.refs.myfile.files[0];
+                            // 上传前预览
+                            let fr = new FileReader();
+                            // 读取这个图片
+                            fr.readAsDataURL(thepic);
+                            // 读完了
+                            fr.onload = (e) => {
+                                this.setState({
+                                    base64: e.target.result
+                                });
+                            };
+
+                            // 向爸爸回调这个图片
+                            if (this.props.getZm !== undefined) {
+                                this.props.getZm(thepic);
+                            } else if (this.props.getFm !== undefined) {
+                                this.props.getFm(thepic);
+                            }
+                        }} />
+                        <Icon className="plus" type="plus-circle" />
+                    </div>
+                </Col>
+            </Row>
         );
     }
 }
